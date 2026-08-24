@@ -5,7 +5,6 @@ const baseUrl = process.env.TRUEFORGE_BASE_URL ?? 'http://127.0.0.1:8790';
 const mcpUrl = process.env.MCP_BASE_URL ?? 'http://127.0.0.1:8788/mcp';
 const modelUrl = process.env.MODEL_BASE_URL ?? 'http://127.0.0.1:8789/v1';
 const approveLocalMock = process.argv.includes('--approve-local-mock');
-const skipSandbox = process.env.DEMO_SKIP_SANDBOX === '1';
 const client = new TrueForge({ baseUrl, timeoutInSeconds: 600 });
 
 const state = {
@@ -15,7 +14,6 @@ const state = {
   status: 'configuring',
   selected: { id: 'tf-ui-2026', title: 'Best UI — Agent Harness Hackathon', ev: 134.92 },
   trueforge: { version: '0.1.4', harness: true, mcp: false, sandbox: false, subagents: 0, approvalGate: false, sessionPersistence: false },
-  blockers: skipSandbox ? ['TrueForge local sandbox unavailable inside the outer Codex macOS sandbox; official isolation was not bypassed.'] : [],
   timeline: [],
   events: []
 };
@@ -56,7 +54,7 @@ const { data: session } = await client.sessions.create({
         requireApprovalForTools: ['mock_irreversible_submit']
       }],
       config: {
-        sandbox: { enabled: !skipSandbox },
+        sandbox: { enabled: true },
         dynamicSubAgents: { enabled: true },
         askUserQuestions: { enabled: true },
         contextManagement: { compaction: { enabled: true }, largeToolResponse: { enabled: true } },
@@ -119,6 +117,6 @@ state.trueforge.sessionPersistence = persisted.id === session.id;
 state.completedAt = new Date().toISOString();
 await save();
 
-const required = state.trueforge.mcp && (state.trueforge.sandbox || skipSandbox) && state.trueforge.subagents >= 2 && state.trueforge.approvalGate && state.trueforge.sessionPersistence;
+const required = state.trueforge.mcp && state.trueforge.sandbox && state.trueforge.subagents >= 2 && state.trueforge.approvalGate && state.trueforge.sessionPersistence;
 if (!required) throw new Error(`Harness evidence incomplete: ${JSON.stringify(state.trueforge)}`);
 console.log(JSON.stringify({ ok: true, status: state.status, sessionId: session.id, evidence: state.trueforge, artifact: 'demo-artifacts/latest-run.json' }, null, 2));

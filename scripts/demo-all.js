@@ -30,9 +30,9 @@ async function waitFor(url, timeoutMs = 90000) {
   throw new Error(`Timed out waiting for ${url}: ${last}`);
 }
 
-async function run(command, args, env = {}) {
+async function run(command, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd: root, env: { ...process.env, ...env }, stdio: 'inherit' });
+    const child = spawn(command, args, { cwd: root, env: process.env, stdio: 'inherit' });
     child.once('exit', code => code === 0 ? resolve() : reject(new Error(`${command} exited ${code}`)));
   });
 }
@@ -61,7 +61,7 @@ try {
     waitFor('http://127.0.0.1:8788/health'), waitFor('http://127.0.0.1:8789/health'),
     waitFor('http://127.0.0.1:4173/api/state'), waitFor('http://127.0.0.1:8790')
   ]);
-  await run(process.execPath, ['scripts/run-demo.js', '--approve-local-mock'], process.env.DEMO_SKIP_SANDBOX === '1' ? { DEMO_SKIP_SANDBOX: '1' } : {});
+  await run(process.execPath, ['scripts/run-demo.js', '--approve-local-mock']);
 
   const trueforge = children.find(entry => entry.name === 'trueforge');
   await stop(trueforge);
