@@ -1,0 +1,27 @@
+{
+  "name": "opportunity-operator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A TrueForge-native opportunity agent that researches bounties and stops before irreversible submission.",
+  "scripts": {
+    "test": "node --test",
+    "start": "node src/dashboard-server.js",
+    "mcp": "node src/mcp-server.js",
+    "model": "node src/mock-model-server.js",
+    "trueforge": "trueforge --port 8790",
+    "demo": "node scripts/run-demo.js",
+    "demo:all": "node scripts/demo-all.js",
+    "verify": "npm test && node scripts/static-check.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.2",
+    "@truefoundry/trueforge": "0.1.4",
+    "@truefoundry/trueforge-sdk": "0.1.3",
+    "zod": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=22.14"
+  },
+  "license": "MIT"
+}
