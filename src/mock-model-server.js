@@ -25,10 +25,10 @@ function lastToolResult(messages) {
 
 function candidate() {
   return {
-    id: 'tf-ui-2026', title: 'Best UI — Agent Harness Hackathon', source: 'authorized-demo-feed',
-    rewardUsd: 1200, deadline: '2026-08-30T19:00:00.000Z', effortHours: 14,
-    winProbability: 0.34, strategicReuse: 0.92, risk: 0.08,
-    expectedValueUsd: 134.92, recommendation: 'pursue'
+    id: 'tf-best-use-2026', title: 'Best Use of TrueForge — Agent Harness Hackathon', source: 'wemakedevs-official-live',
+    rewardUsd: 5000, deadline: '2026-08-30T19:00:00.000Z', effortHours: 14,
+    winProbability: 0.18, strategicReuse: 0.92, risk: 0.08,
+    expectedValueUsd: 577.94, recommendation: 'pursue'
   };
 }
 
@@ -41,12 +41,12 @@ function decide(body) {
   if (isSubagent) {
     if (text.includes('INDEPENDENT VERIFIER')) {
       if (!calls.includes('independent_verify')) {
-        return call('independent_verify', { candidate: candidate() });
+      return call('independent_verify', { candidate: candidate() });
       }
       return say('Independent verifier PASS: positive EV, authorized source, deadline present, no payment/signing, and submission is local mock only.');
     }
     if (!calls.includes('research_opportunity')) {
-      return call('research_opportunity', { opportunityId: 'tf-ui-2026', focus: 'eligibility, evidence, constraints, and strategic fit' });
+    return call('research_opportunity', { opportunityId: 'tf-best-use-2026', focus: 'eligibility, evidence, constraints, and strategic fit' });
     }
     return say('Research complete: the selected opportunity is authorized, strategically reusable, and requires no external side effect during this run. Confidence 0.88.');
   }
@@ -58,13 +58,13 @@ function decide(body) {
   if (subagentCount === 0) {
     return call('create_sub_agent', {
       name: 'candidate-researcher',
-      input: 'Research opportunity tf-ui-2026 from the authorized demo feed. Check evidence, eligibility constraints, and strategic fit. Do not perform any write, payment, login, signing, or submission. Return a concise evidence summary.'
+      input: 'Research opportunity tf-best-use-2026 from the live official WeMakeDevs feed. Check evidence, eligibility constraints, and strategic fit. Do not perform any write, payment, login, signing, or submission. Return a concise evidence summary.'
     });
   }
   if (availableTool(body, 'exec') && !calls.includes('exec')) {
     return call('exec', {
       intent: 'Run a deterministic candidate validation inside the isolated TrueForge sandbox.',
-      command: "python - <<'PY'\nimport json\ncandidate={'id':'tf-ui-2026','expectedValueUsd':134.92,'authorized':True}\nassert candidate['expectedValueUsd'] > 0\nassert candidate['authorized'] is True\nopen('candidate-check.json','w').write(json.dumps(candidate))\nprint('SANDBOX_TEST_PASS', json.dumps(candidate))\nPY"
+      command: "python - <<'PY'\nimport json\ncandidate={'id':'tf-best-use-2026','expectedValueUsd':577.94,'authorized':True}\nassert candidate['expectedValueUsd'] > 0\nassert candidate['authorized'] is True\nopen('candidate-check.json','w').write(json.dumps(candidate))\nprint('SANDBOX_TEST_PASS', json.dumps(candidate))\nPY"
     });
   }
   if (subagentCount === 1) {
@@ -75,7 +75,7 @@ function decide(body) {
   }
   if (!calls.includes('mock_irreversible_submit')) {
     return call('mock_irreversible_submit', {
-      opportunityId: 'tf-ui-2026',
+      opportunityId: 'tf-best-use-2026',
       summary: 'Verified candidate package. LOCAL MOCK ONLY; do not transmit externally.'
     });
   }

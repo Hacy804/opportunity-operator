@@ -12,7 +12,7 @@ const state = {
   mode: 'safe local demo',
   startedAt: new Date().toISOString(),
   status: 'configuring',
-  selected: { id: 'tf-ui-2026', title: 'Best UI — Agent Harness Hackathon', ev: 134.92 },
+  selected: { id: 'tf-best-use-2026', title: 'Best Use of TrueForge — Agent Harness Hackathon', ev: 577.94 },
   trueforge: { version: '0.1.4', harness: true, mcp: false, sandbox: false, subagents: 0, approvalGate: false, sessionPersistence: false },
   timeline: [],
   events: []

@@ -6,7 +6,7 @@ Built during The Agent Harness Hackathon on 2026-08-24. TrueForge is the runtime
 
 ## What the demo proves
 
-- A public/authorized fixture enters through an MCP tool, never by hidden application logic.
+- The official public WeMakeDevs rules page is fetched live through an MCP tool, with source provenance and fail-closed validation. Fixture mode is explicit and test-only.
 - TrueForge delegates research and verification into separate dynamic subagent threads.
 - A candidate assertion is executed through TrueForge's standalone isolated sandbox.
 - `mock_irreversible_submit` is declared destructive and explicitly gated in the agent spec.
@@ -41,7 +41,7 @@ npm test
 npm run demo:all
 ```
 
-Then open `http://127.0.0.1:4173`. `demo:all` starts the local MCP server, deterministic OpenAI-compatible demo endpoint, TrueForge, and dashboard; runs the workflow; checks persistence after a TrueForge restart; and shuts services down. It never needs a real model key or external account.
+Then open `http://127.0.0.1:4173`. `demo:all` starts the local MCP server, deterministic OpenAI-compatible demo endpoint, TrueForge, and dashboard; reads the public official opportunity page, runs the workflow, checks persistence after a TrueForge restart, and shuts services down. It needs internet access for the read-only live feed but never needs a real model key or external account. Set `BOUNTY_FEED_MODE=fixture` only for offline development and tests.
 
 To leave the workflow paused instead of approving the local mock, start the services and run `npm run demo` without `--approve-local-mock`.
 
@@ -61,7 +61,7 @@ The deterministic model endpoint exists only so judges can reproduce the full ha
 
 - Localhost binding only; standalone TrueForge is never exposed publicly.
 - No wallet, signing, payment, publishing, login, or submission credentials exist.
-- The feed is an explicitly authorized local fixture with source URLs for provenance.
+- The default feed is the public official WeMakeDevs rules page. It is read-only, allowlisted, source-attributed, and validated before use.
 - The only write-like MCP tool returns a local JSON receipt and has no network client.
 - Independent verification fails closed on authorization and EV checks.
 - Real GitHub/Qodo/hackathon submission is deliberately outside this repo's executable path.
@@ -78,6 +78,16 @@ OpenAI Codex was used as an AI coding assistant for implementation, documentatio
 
 ## Hackathon compliance
 
-Original project code and design began on 2026-08-24 during the published hackathon window. Dependencies and public frameworks are credited through `package-lock.json`. Before submission, a human must create the public repository, review the disclosure, record the demo, optionally run Qodo for the code-quality track, and submit through the event account.
+Original project code and design began on 2026-08-24 during the published hackathon window. Dependencies and public frameworks are credited through `package-lock.json`. Before submission, a human must create the public repository through a feature pull request, complete the required Qodo review trail, review the disclosure, record the demo, and submit through the event account.
+
+## Qodo Code Review Evidence
+
+Required before submission. Replace the placeholders below from the representative public pull request after Qodo completes its initial and follow-up reviews.
+
+- Representative merged PR: `[ADD PUBLIC PR URL]`
+- Qodo finding and decision: `[ADD 1–2 SENTENCES: what Qodo surfaced and what was fixed or intentionally dismissed]`
+- Follow-up review: `[CONFIRM THE FINAL QODO REVIEW IS VISIBLE IN THE PR HISTORY]`
+
+The official requirement is documented in the [hackathon rules](https://www.wemakedevs.org/hackathons/trueforge/rules). Screenshots may supplement this public PR link but cannot replace it.
 
 MIT licensed. See [LICENSE](LICENSE).

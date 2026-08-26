@@ -1,6 +1,6 @@
 import { access, readFile } from 'node:fs/promises';
 
-const required = ['README.md', 'SECURITY.md', '.env.example', 'docs/DEMO_SCRIPT.md', 'docs/SUBMISSION_DRAFT.md', 'public/index.html'];
+const required = ['README.md', 'SECURITY.md', '.env.example', 'docs/DEMO_SCRIPT.md', 'docs/SUBMISSION_DRAFT.md', 'docs/SUBMISSION_CHECKLIST.md', 'public/index.html'];
 await Promise.all(required.map(path => access(new URL(`../${path}`, import.meta.url))));
 const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8');
 for (const phrase of ['TrueForge', 'mermaid', 'AI coding', 'human approval']) {

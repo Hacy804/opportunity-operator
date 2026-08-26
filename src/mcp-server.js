@@ -1,14 +1,13 @@
 import http from 'node:http';
 import { randomUUID } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 import { normalizeBounty, scoreBounty, verifyCandidate } from './domain.js';
+import { loadAuthorizedBounties } from './feed.js';
 
 const port = Number(process.env.MCP_PORT ?? 8788);
-const fixtureUrl = new URL('../data/bounties.json', import.meta.url);
 const transports = new Map();
 
 function content(value) {
@@ -19,10 +18,10 @@ function createMcpServer() {
   const server = new McpServer({ name: 'opportunity-tools', version: '0.1.0' });
 
   server.registerTool('fetch_authorized_bounties', {
-    description: 'Read the public/authorized demo bounty feed. No login or private data.',
-    inputSchema: {},
-    annotations: { readOnlyHint: true, openWorldHint: false }
-  }, async () => content(JSON.parse(await readFile(fixtureUrl, 'utf8'))));
+    description: 'Fetch the public official hackathon rules as a live bounty feed. Fixture mode is explicit and test-only.',
+    inputSchema: { mode: z.enum(['live', 'fixture']).default('live') },
+    annotations: { readOnlyHint: true, openWorldHint: true }
+  }, async ({ mode }) => content(await loadAuthorizedBounties({ mode })));
 
   server.registerTool('normalize_bounties', {
     description: 'Normalize raw bounty records into the project schema.',

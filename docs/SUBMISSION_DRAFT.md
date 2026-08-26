@@ -28,4 +28,5 @@ OpenAI Codex assisted with code, tests, documentation, and debugging. The partic
 
 - Public repository: `[ADD AFTER HUMAN REVIEW]`
 - Three-minute video: `[ADD AFTER RECORDING]`
-- Optional blog/Qodo report: `[ADD IF ENTERING]`
+- Required Qodo-reviewed public PR: `[ADD BEFORE SUBMISSION]`
+- Optional blog: `[ADD IF ENTERING BLOG PRIZE]`

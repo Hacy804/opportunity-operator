@@ -17,7 +17,10 @@ export function normalizeBounty(raw) {
     winProbability: clamp(Number(raw.winProbability), 0, 1),
     strategicReuse: clamp(Number(raw.strategicReuse ?? 0), 0, 1),
     risk: clamp(Number(raw.risk ?? 0.25), 0, 1),
-    url: String(raw.url ?? '')
+    url: String(raw.url ?? ''),
+    ...(raw.sourceType ? { sourceType: String(raw.sourceType) } : {}),
+    ...(raw.liveVerified !== undefined ? { liveVerified: Boolean(raw.liveVerified) } : {}),
+    ...(raw.fetchedAt ? { fetchedAt: new Date(raw.fetchedAt).toISOString() } : {})
   };
 }
 
@@ -39,7 +42,7 @@ export function scoreBounty(bounty, hourlyCost = 35) {
 export function verifyCandidate(candidate) {
   const checks = [
     { name: 'positive EV', pass: candidate.expectedValueUsd > 0 },
-    { name: 'authorized source', pass: candidate.source === 'authorized-demo-feed' },
+    { name: 'authorized source', pass: ['authorized-demo-feed', 'wemakedevs-official-live'].includes(candidate.source) },
     { name: 'deadline present', pass: Boolean(candidate.deadline) },
     { name: 'no payment or signing', pass: true },
     { name: 'submission remains mock', pass: true }
