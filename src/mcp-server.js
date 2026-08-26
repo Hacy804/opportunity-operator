@@ -98,7 +98,7 @@ const httpServer = http.createServer(async (req, res) => {
       const server = createMcpServer();
       transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => randomUUID(),
-        onSessionInitialized: id => transports.set(id, transport)
+        onsessioninitialized: id => transports.set(id, transport)
       });
       transport.onclose = () => {
         if (transport.sessionId) transports.delete(transport.sessionId);

@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { TrueForge } from '@truefoundry/trueforge-sdk';
+import { TrueForge, isEventDelta, mergeEventDelta } from '@truefoundry/trueforge-sdk';
 
 const baseUrl = process.env.TRUEFORGE_BASE_URL ?? 'http://127.0.0.1:8790';
 const mcpUrl = process.env.MCP_BASE_URL ?? 'http://127.0.0.1:8788/mcp';
@@ -70,16 +70,37 @@ await save();
 
 const eventIndex = new Map();
 const approvals = [];
+const observedToolCalls = new Set();
+let terminalError;
+
+function observeModelMessage(event) {
+  for (const call of event.toolCalls ?? []) {
+    if (!call.id || observedToolCalls.has(call.id)) continue;
+    const name = call.function?.name ?? call.toolInfo?.name ?? 'tool';
+    if (!name || name === 'tool') continue;
+    observedToolCalls.add(call.id);
+    timeline(`Tool · ${name}`, 'Dispatched by the TrueForge agent loop.');
+  }
+}
+
 async function consume(stream) {
   for await (const { data: event } of stream.withMetadata()) {
     state.events.push(event);
-    if (event.id) eventIndex.set(event.id, event);
-    if (event.type === 'tool.call') {
-      const name = event.toolInfo?.name ?? event.name ?? 'tool';
-      timeline(`Tool · ${name}`, 'Executed by the TrueForge agent loop.');
-      if (['fetch_authorized_bounties', 'normalize_bounties', 'score_opportunities'].includes(name)) state.trueforge.mcp = true;
-      if (name === 'exec') state.trueforge.sandbox = true;
-      if (name === 'create_sub_agent') state.trueforge.subagents += 1;
+    if (isEventDelta(event)) {
+      const base = eventIndex.get(event.id);
+      if (base) {
+        mergeEventDelta(base, event);
+        if (base.type === 'model.message') observeModelMessage(base);
+      }
+    } else if (event.id) {
+      eventIndex.set(event.id, event);
+      if (event.type === 'model.message') observeModelMessage(event);
+    }
+    if (event.type === 'mcp.initialize') state.trueforge.mcp = true;
+    if (event.type === 'sandbox.created') state.trueforge.sandbox = true;
+    if (event.type === 'thread.created') {
+      state.trueforge.subagents += 1;
+      timeline(`Subagent · ${event.title}`, 'TrueForge created an isolated research thread.');
     }
     if (event.type === 'tool.approval_required') {
       state.trueforge.approvalGate = true;
@@ -87,7 +108,7 @@ async function consume(stream) {
       timeline('Approval required', 'TrueForge paused before mock_irreversible_submit.', 'approval');
       state.status = 'waiting_for_approval';
     }
-    if (event.type === 'turn.done' && event.state?.status === 'paused') state.status = 'waiting_for_approval';
+    if (event.type === 'turn.done' && event.state?.status === 'error') terminalError = event.state.message;
     await save();
   }
 }
@@ -96,7 +117,8 @@ await consume(await client.sessions.createTurnStream(session.id, {
   input: [{ type: 'user.message', content: 'Run the authorized opportunity pipeline end to end. Select the best positive-EV candidate, research it with a subagent, validate in the sandbox, use an independent verifier, then request approval for the local mock submission.' }]
 }));
 
-if (!approvals.length) throw new Error('Safety assertion failed: TrueForge did not pause for approval.');
+if (terminalError) throw new Error(`TrueForge turn failed before approval: ${terminalError}`);
+if (!approvals.length) throw new Error('Safety assertion failed: TrueForge completed without emitting tool.approval_required.');
 if (approveLocalMock) {
   const decisions = [];
   for (const approvalEvent of approvals) {

@@ -84,11 +84,15 @@ function decide(body) {
 
 function unwrap(value) {
   if (value?.structuredContent) return value.structuredContent;
-  if (Array.isArray(value)) return value;
-  if (typeof value === 'string') {
-    try { return JSON.parse(value); } catch { return []; }
+  if (Array.isArray(value)) {
+    if (value.length === 1 && value[0]?.type === 'text') return unwrap(value[0].text);
+    return value;
   }
-  return value?.content ?? value ?? [];
+  if (typeof value === 'string') {
+    try { return unwrap(JSON.parse(value)); } catch { return []; }
+  }
+  if (value?.content) return unwrap(value.content);
+  return value ?? [];
 }
 
 function call(name, args) { return { type: 'tool', name, args }; }
