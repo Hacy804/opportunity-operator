@@ -1,0 +1,26 @@
+[
+  {
+    "id": "tf-ui-2026",
+    "source": "authorized-demo-feed",
+    "title": "Best UI — Agent Harness Hackathon",
+    "rewardUsd": 1200,
+    "deadline": "2026-08-30T19:00:00Z",
+    "effortHours": 14,
+    "winProbability": 0.34,
+    "strategicReuse": 0.92,
+    "risk": 0.08,
+    "url": "https://www.wemakedevs.org/hackathons/trueforge/rules"
+  },
+  {
+    "id": "oss-docs-17",
+    "source": "authorized-demo-feed",
+    "title": "Open-source documentation bounty",
+    "rewardUsd": 450,
+    "deadline": "2026-09-04T16:00:00Z",
+    "effortHours": 9,
+    "winProbability": 0.55,
+    "strategicReuse": 0.35,
+    "risk": 0.05,
+    "url": "https://example.org/authorized-demo-bounty"
+  }
+]
